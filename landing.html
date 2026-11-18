@@ -332,16 +332,106 @@
   </script>
 </section>
 
+
 <section class="simulation" id="simulation">
   <div class="chapter-number">04 / Computational Experiment</div>
+
   <h2>SIMULATING<br>THE FRONTIER</h2>
+
   <p class="description">
-    What changes when we model fire through climate
-    variables alone, compared with a model that also
-    considers human transformation of the landscape?
+    What happens when we compare climate-driven fire
+    conditions with scenarios that also consider
+    human transformation of the forest?
   </p>
-  <p>Computational simulation in development.</p>
+
+  <div style="background:#303030;padding:30px;margin-top:40px;">
+
+    <div class="chapter-number">SCENARIO EXPLORER / PROTOTYPE</div>
+
+    <h3 style="font-size:30px;">
+      WHAT HAPPENS IN THE NEXT 20 YEARS?
+    </h3>
+
+    <p>Select a region:</p>
+
+    <select id="sim-region"
+      style="padding:12px;width:100%;max-width:400px;">
+      <option value="Borneo">Borneo</option>
+      <option value="Andes–Amazon">Andes–Amazon</option>
+    </select>
+
+    <p style="margin-top:25px;">Select a scenario:</p>
+
+    <select id="sim-scenario"
+      style="padding:12px;width:100%;max-width:400px;">
+      <option value="Climate conditions only">
+        A — Climate conditions only
+      </option>
+      <option value="Climate + land transformation">
+        B — Climate + land transformation
+      </option>
+    </select>
+
+    <p style="margin-top:25px;">Years into the future:</p>
+
+    <input type="range" id="sim-years"
+      min="0" max="20" step="5" value="0"
+      style="width:100%;max-width:400px;">
+
+    <p><strong id="sim-years-label">0</strong> years</p>
+
+    <button type="button" id="sim-run"
+      style="background:#f000ba;color:white;
+             border:0;padding:16px 25px;
+             font-weight:bold;cursor:pointer;">
+      EXPLORE SCENARIO →
+    </button>
+
+    <div id="sim-output"
+      aria-live="polite"
+      style="background:#191919;padding:25px;margin-top:25px;">
+      Select parameters and explore a scenario.
+    </div>
+
+  </div>
+
+  <p style="font-size:13px;opacity:.7;margin-top:25px;">
+    This is a conceptual scenario interface.
+    It does not calculate future burned area,
+    fire probability, or forest loss.
+    Model assumptions and datasets must be
+    established before quantitative simulation.
+  </p>
+
+  <script>
+    const simYears = document.getElementById("sim-years");
+    const simYearsLabel = document.getElementById("sim-years-label");
+
+    simYears.addEventListener("input", function () {
+      simYearsLabel.textContent = simYears.value;
+    });
+
+    document.getElementById("sim-run")
+      .addEventListener("click", function () {
+
+        const region =
+          document.getElementById("sim-region").value;
+
+        const scenario =
+          document.getElementById("sim-scenario").value;
+
+        const years = simYears.value;
+
+        document.getElementById("sim-output").textContent =
+          "Region: " + region +
+          " | Scenario: " + scenario +
+          " | Horizon: " + years + " years. " +
+          "No predictive model has been run. " +
+          "This selection defines a future experiment.";
+      });
+  </script>
 </section>
+
 
 <footer>
   BURNING FRONTIERS — Research and computational mapping prototype, 2026
