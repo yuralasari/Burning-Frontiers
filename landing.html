@@ -258,15 +258,78 @@
   </p>
 </section>
 
+
 <section class="wildfire" id="wildfire">
   <div class="chapter-number">03 / Wildfires</div>
+
   <h2>WHAT MAKES<br>A FOREST BURN?</h2>
+
   <p class="description">
-    Climate can intensify fire conditions. But how do
-    land transformation and human activities influence
-    where fires occur?
+    Drought can create conditions favorable to fire.
+    But ignition, land use, and forest transformation
+    also shape where and how fires occur.
+    Compare two tropical forest frontiers.
   </p>
-  <p>Historical wildfire observations will be added here.</p>
+
+  <div style="display:grid;
+              grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+              gap:20px;margin-top:45px;">
+
+    <div style="background:#191919;color:white;padding:30px;">
+      <div class="chapter-number">REGION 01 / BORNEO</div>
+      <h3 style="font-size:32px;">FIRE IN BORNEO</h3>
+      <p>Historical burned area</p>
+      <p style="font-size:13px;opacity:.7;">
+        Awaiting wildfire dataset
+      </p>
+    </div>
+
+    <div style="background:#f000ba;color:white;padding:30px;">
+      <div class="chapter-number">REGION 02 / ANDES–AMAZON</div>
+      <h3 style="font-size:32px;">FIRE IN THE AMAZON</h3>
+      <p>Historical burned area</p>
+      <p style="font-size:13px;opacity:.8;">
+        Awaiting wildfire dataset
+      </p>
+    </div>
+
+  </div>
+
+  <div style="background:#ffffff;color:#191919;
+              padding:30px;margin-top:25px;">
+
+    <div class="chapter-number">EXPLORE THE TIMELINE</div>
+    <h3 style="font-size:30px;">WHEN DO FORESTS BURN?</h3>
+
+    <label for="fire-year">Select comparison year</label>
+
+    <input
+      type="range"
+      id="fire-year"
+      min="2015"
+      max="2024"
+      step="1"
+      value="2015"
+      style="width:100%;margin-top:25px;">
+
+    <p>Year: <strong id="fire-year-label">2015</strong></p>
+
+    <p id="fire-status">
+      Wildfire observations for this year have not yet
+      been integrated.
+    </p>
+    <p style="font-size:13px;color:#666;">
+      Timeline interface prototype.
+      No wildfire measurements are displayed yet.
+    </p>
+  </div>
+  <script>
+    const fireYear = document.getElementById("fire-year");
+    const fireYearLabel = document.getElementById("fire-year-label");
+    fireYear.addEventListener("input", function () {
+      fireYearLabel.textContent = fireYear.value;
+    });
+  </script>
 </section>
 
 <section class="simulation" id="simulation">
