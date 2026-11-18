@@ -1,0 +1,351 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Burning Frontiers — Fire Simulation</title>
+
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #171717;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+header {
+  padding: 20px 5%;
+  background: #ff1616;
+}
+header a { color: white; text-decoration: none; }
+main { padding: 35px 5%; }
+h1 { font-size: clamp(36px, 6vw, 70px); margin: 10px 0; }
+p { line-height: 1.5; }
+.layout {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 25px;
+}
+.controls, .visual {
+  background: #292929;
+  padding: 22px;
+}
+label {
+  display: block;
+  margin: 20px 0 8px;
+  font-size: 14px;
+}
+select, input { width: 100%; }
+select { padding: 12px; }
+button {
+  border: 0;
+  padding: 13px 17px;
+  cursor: pointer;
+  font-weight: bold;
+  margin: 8px 5px 0 0;
+}
+.primary { background: #f000ba; color: white; }
+canvas {
+  display: block;
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+  background: #12251b;
+  image-rendering: pixelated;
+}
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px;
+  margin-top: 20px;
+}
+.stat strong {
+  display: block;
+  font-size: 28px;
+  margin-top: 5px;
+}
+.legend {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  font-size: 13px;
+}
+.swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 5px;
+}
+small { color: #bdbdbd; }
+@media (max-width: 800px) {
+  .layout { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <a href="landing.html#simulation">
+    ← BACK TO BURNING FRONTIERS
+  </a>
+</header>
+
+<main>
+  <small>COMPUTATIONAL EXPERIMENT / PROTOTYPE 01</small>
+  <h1>SIMULATING THE FRONTIER</h1>
+
+  <p>
+    How does land transformation change wildfire spread
+    under comparable climate conditions?
+  </p>
+
+  <div class="layout">
+
+    <div class="controls">
+      <h2>MODEL PARAMETERS</h2>
+
+      <label for="scenario">Scenario</label>
+      <select id="scenario">
+        <option value="climate">A — Climate only</option>
+        <option value="land">B — Climate + transformed land</option>
+      </select>
+
+      <label for="dryness">Dryness: <span id="dryLabel">50</span>%</label>
+      <input id="dryness" type="range"
+             min="0" max="100" value="50">
+
+      <label for="wind">Eastward wind influence:
+        <span id="windLabel">30</span>%
+      </label>
+      <input id="wind" type="range"
+             min="0" max="100" value="30">
+
+      <label for="speed">Simulation speed</label>
+      <input id="speed" type="range"
+             min="1" max="10" value="5">
+
+      <div style="margin-top:20px;">
+        <button class="primary" id="run">RUN</button>
+        <button id="pause">PAUSE</button>
+        <button id="reset">RESET</button>
+      </div>
+
+      <p><small>
+        Illustrative cellular automaton.
+        Parameters are not calibrated to observed fires.
+      </small></p>
+    </div>
+
+    <div class="visual">
+      <h2>FIRE SPREAD GRID</h2>
+
+      <canvas id="grid" width="600" height="400"></canvas>
+
+      <div class="legend">
+        <span><i class="swatch" style="background:#397a53;"></i>Forest</span>
+        <span><i class="swatch" style="background:#a6a39c;"></i>Transformed land</span>
+        <span><i class="swatch" style="background:#ffce3a;"></i>Burning</span>
+        <span><i class="swatch" style="background:#c04a2a;"></i>Burned</span>
+      </div>
+
+      <div class="stats">
+        <div class="stat">Time step<strong id="steps">0</strong></div>
+        <div class="stat">Burned cells<strong id="burned">0</strong></div>
+        <div class="stat">Burned share<strong id="share">0%</strong></div>
+      </div>
+
+      <p><small>
+        Burned share is calculated relative to the
+        initially burnable cells, not geographic area.
+      </small></p>
+    </div>
+
+  </div>
+</main>
+
+<script>
+const W = 60;
+const H = 40;
+const CELL = 10;
+
+const FOREST = 0;
+const TRANSFORMED = 1;
+const BURNING = 2;
+const BURNED = 3;
+
+const canvas = document.getElementById("grid");
+const ctx = canvas.getContext("2d");
+
+const scenario = document.getElementById("scenario");
+const dryness = document.getElementById("dryness");
+const wind = document.getElementById("wind");
+const speed = document.getElementById("speed");
+
+let grid = [];
+let initialBurnable = 0;
+let steps = 0;
+let running = false;
+let timer = null;
+
+function randomGrid() {
+  return Array.from({length:H}, () =>
+    Array.from({length:W}, () => FOREST)
+  );
+}
+
+function reset() {
+  pause();
+  grid = randomGrid();
+  steps = 0;
+
+  if (scenario.value === "land") {
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        // Illustrative transformed-land corridor.
+        if (x > 20 && x < 29 && y > 5 && y < 35) {
+          grid[y][x] = TRANSFORMED;
+        }
+      }
+    }
+  }
+
+  // Same ignition location in both scenarios.
+  grid[20][8] = BURNING;
+
+  initialBurnable = grid.flat()
+    .filter(v => v === FOREST).length + 1;
+
+  updateStats();
+  draw();
+}
+
+function draw() {
+  const colors = {
+    0:"#397a53",
+    1:"#a6a39c",
+    2:"#ffce3a",
+    3:"#c04a2a"
+  };
+
+  ctx.clearRect(0,0,600,400);
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      ctx.fillStyle = colors[grid[y][x]];
+      ctx.fillRect(x*CELL,y*CELL,CELL-1,CELL-1);
+    }
+  }
+}
+
+function updateStats() {
+  const burned = grid.flat()
+    .filter(v => v === BURNED).length;
+
+  document.getElementById("steps").textContent = steps;
+  document.getElementById("burned").textContent = burned;
+
+  document.getElementById("share").textContent =
+    (100 * burned / initialBurnable).toFixed(1) + "%";
+}
+
+function tick() {
+  const next = grid.map(row => [...row]);
+  const dry = Number(dryness.value) / 100;
+  const eastWind = Number(wind.value) / 100;
+
+  let active = false;
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      if (grid[y][x] !== BURNING) continue;
+
+      active = true;
+      next[y][x] = BURNED;
+
+      const neighbors = [
+        [1,0],[-1,0],[0,1],[0,-1]
+      ];
+
+      for (const [dx,dy] of neighbors) {
+        const nx = x + dx;
+        const ny = y + dy;
+
+        if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
+        if (grid[ny][nx] !== FOREST) continue;
+
+        let probability = 0.15 + 0.55 * dry;
+
+        // Eastward wind favors eastward spread.
+        if (dx === 1) {
+          probability += 0.25 * eastWind;
+        }
+
+        probability = Math.min(1, probability);
+
+        if (Math.random() < probability) {
+          next[ny][nx] = BURNING;
+        }
+      }
+    }
+  }
+
+  if (!active) {
+    pause();
+    return;
+  }
+
+  grid = next;
+  steps++;
+  draw();
+  updateStats();
+
+  if (!grid.some(row => row.includes(BURNING))) {
+    pause();
+  }
+}
+
+function pause() {
+  running = false;
+  if (timer !== null) {
+    clearInterval(timer);
+    timer = null;
+  }
+}
+
+function run() {
+  if (running) return;
+  running = true;
+
+  const delay = 600 - Number(speed.value) * 50;
+  timer = setInterval(tick, delay);
+}
+
+document.getElementById("run").onclick = run;
+document.getElementById("pause").onclick = pause;
+document.getElementById("reset").onclick = reset;
+
+scenario.onchange = reset;
+
+dryness.oninput = () => {
+  document.getElementById("dryLabel").textContent = dryness.value;
+};
+
+wind.oninput = () => {
+  document.getElementById("windLabel").textContent = wind.value;
+};
+
+speed.oninput = () => {
+  if (running) {
+    pause();
+    run();
+  }
+};
+
+reset();
+</script>
+
+</body>
+</html>
