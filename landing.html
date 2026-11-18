@@ -1,0 +1,179 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Burning Frontiers</title>
+  <style>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #e5e5e5;
+      color: #161616;
+    }
+    nav {
+      position: sticky;
+      top: 0;
+      background: #171717;
+      padding: 17px 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      z-index: 10;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .chapters {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .hero {
+      background: #ff1616;
+      color: white;
+      min-height: 75vh;
+      padding: 10% 7%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    h1 {
+      font-size: clamp(55px, 10vw, 150px);
+      line-height: .88;
+      letter-spacing: -5px;
+      margin: 25px 0;
+      max-width: 1100px;
+    }
+    .hero p {
+      font-size: clamp(19px, 2.5vw, 32px);
+      max-width: 750px;
+      line-height: 1.3;
+    }
+    section { padding: 90px 7%; min-height: 65vh; }
+    .chapter-number {
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    h2 {
+      font-size: clamp(40px, 6vw, 85px);
+      line-height: 1;
+      letter-spacing: -2px;
+      margin: 25px 0;
+    }
+    .description {
+      max-width: 700px;
+      font-size: 19px;
+      line-height: 1.6;
+    }
+    .weather {
+      border-left: 32px solid #f000ba;
+      background: #f5f5f5;
+    }
+    .forest { background: #d7d7d7; }
+    .wildfire { background: #ff1616; color: white; }
+    .simulation { background: #191919; color: white; }
+    .map-button {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 17px 24px;
+      background: #f000ba;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .map-button:hover { background: #b9008d; }
+    footer {
+      background: #111;
+      color: white;
+      padding: 35px 7%;
+      font-size: 13px;
+    }
+    @media (max-width: 700px) {
+      nav { align-items: flex-start; flex-direction: column; }
+      .chapters { gap: 12px; }
+      h1 { letter-spacing: -2px; }
+      section { padding: 65px 7%; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="#home"><strong>BURNING FRONTIERS</strong></a>
+  <div class="chapters">
+    <a href="#weather">Weather</a>
+    <a href="#forest">Forest</a>
+    <a href="#wildfire">Wildfires</a>
+    <a href="#simulation">Simulation</a>
+  </div>
+</nav>
+
+<header class="hero" id="home">
+  <div class="chapter-number">An interactive environmental investigation</div>
+  <h1>BURNING<br>FRONTIERS</h1>
+  <p>When climate becomes the explanation, what happens to human responsibility?</p>
+  <div>Comparing Borneo and the Andes–Amazon</div>
+  <a class="map-button" href="#weather">Explore the project ↓</a>
+</header>
+
+<section class="weather" id="weather">
+  <div class="chapter-number">01 / Weather</div>
+  <h2>EL NIÑO /<br>CLIMATE CHANGE</h2>
+  <p class="description">
+    How does climate variability influence the conditions
+    under which forests burn? Explore atmospheric patterns
+    across two tropical forest landscapes.
+  </p>
+  <a class="map-button" href="index.html">
+    Explore ERA5 Wind Map →
+  </a>
+</section>
+
+<section class="forest" id="forest">
+  <div class="chapter-number">02 / Forest and Extraction</div>
+  <h2>TWO FORESTS.<br>DIFFERENT FRONTIERS.</h2>
+  <p class="description">
+    From forest cover to roads, concessions, and land
+    transformation, this chapter investigates the
+    changing landscapes of Borneo and the Andes–Amazon.
+  </p>
+  <p>Spatial datasets and comparative mapping in development.</p>
+</section>
+
+<section class="wildfire" id="wildfire">
+  <div class="chapter-number">03 / Wildfires</div>
+  <h2>WHAT MAKES<br>A FOREST BURN?</h2>
+  <p class="description">
+    Climate can intensify fire conditions. But how do
+    land transformation and human activities influence
+    where fires occur?
+  </p>
+  <p>Historical wildfire observations will be added here.</p>
+</section>
+
+<section class="simulation" id="simulation">
+  <div class="chapter-number">04 / Computational Experiment</div>
+  <h2>SIMULATING<br>THE FRONTIER</h2>
+  <p class="description">
+    What changes when we model fire through climate
+    variables alone, compared with a model that also
+    considers human transformation of the landscape?
+  </p>
+  <p>Computational simulation in development.</p>
+</section>
+
+<footer>
+  BURNING FRONTIERS — Research and computational mapping prototype, 2026
+</footer>
+
+</body>
+</html>
